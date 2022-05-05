@@ -5,6 +5,12 @@ on:
     branches: [ '**' ]
   pull_request:
     branches: [ '**' ]
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'name'
+        required: false
+        default: 'test'
 
 jobs:
   build:
