@@ -49,9 +49,12 @@ func main() {
 	server.InitApiRouter(r)
 	base := fmt.Sprintf("%s:%d", conf.Conf.Address, conf.Conf.Port)
 	log.Infof("start server @ %s", base)
+	var prefix string
 	if conf.Conf.Scheme.Https {
+		prefix = "https://"
 		go r.RunTLS(base, conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)
 	} else {
+		prefix = "http://"
 		go r.Run(base)
 	}
 	w := webview2.NewWithOptions(webview2.WebViewOptions{
@@ -65,6 +68,6 @@ func main() {
 		},
 	})
 	defer w.Destroy()
-	w.Navigate(base)
+	w.Navigate(prefix + base)
 	w.Run()
 }
