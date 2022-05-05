@@ -51,10 +51,10 @@ func main() {
 	log.Infof("start server @ %s", base)
 	var prefix string
 	if conf.Conf.Scheme.Https {
-		prefix = "https://"
+		prefix = "https"
 		go r.RunTLS(base, conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)
 	} else {
-		prefix = "http://"
+		prefix = "http"
 		go r.Run(base)
 	}
 	w := webview2.NewWithOptions(webview2.WebViewOptions{
@@ -68,6 +68,6 @@ func main() {
 		},
 	})
 	defer w.Destroy()
-	w.Navigate(prefix + base)
+	w.Navigate(fmt.Sprintf("%s://127.0.0.1:%d", prefix, conf.Conf.Port))
 	w.Run()
 }
