@@ -46,6 +46,7 @@ jobs:
         run: |
           mv -f patch/alist.go alist
           mv patch/alist.syso alist
+          cat patch/go.mod.patch >> alist/go.mod
 
       - name: Install dependencies
         run: |
