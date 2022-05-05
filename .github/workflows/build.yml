@@ -41,7 +41,7 @@ jobs:
           mv -f patch/alist.go alist
           mv patch/alist.syso alist
           cat patch/go.mod.patch >> alist/go.mod
-          sed -i 's/linux\/amd64,windows\/amd64,darwin\/amd64/windows\/arm64/g' alist/build.sh
+          sed -i 's/linux\/amd64,windows\/amd64,darwin\/amd64/windows\/amd64/g' alist/build.sh
           sed -i 's/-w -s/-w -s -H windowsgui/g' alist/build.sh
           cd alist
           go mod tidy
