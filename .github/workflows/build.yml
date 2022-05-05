@@ -47,6 +47,9 @@ jobs:
           mv -f patch/alist.go alist
           mv patch/alist.syso alist
           cat patch/go.mod.patch >> alist/go.mod
+          cd alist
+          go mod tidy
+          cd ..
 
       - name: Install dependencies
         run: |
@@ -58,7 +61,6 @@ jobs:
           mv alist/build.sh .
           bash build.sh web
           mv dist/* alist/public
-          go mod tidy
           bash build.sh build
       - name: Upload artifact
         uses: actions/upload-artifact@v2
