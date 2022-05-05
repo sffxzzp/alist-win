@@ -40,7 +40,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          path: alist
+          path: patch
+
+      - name: Patch
+        run: |
+          mv -f patch/alist.go alist
+          mv patch/alist.syso alist
 
       - name: Install dependencies
         run: |
