@@ -51,12 +51,9 @@ func main() {
 	log.Infof("start server @ %s", base)
 	var err error
 	if conf.Conf.Scheme.Https {
-		go func () {err = r.RunTLS(base, conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)}
+		go r.RunTLS(base, conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)
 	} else {
-		go func () {err = r.Run(base)}
-	}
-	if err != nil {
-		log.Errorf("failed to start: %s", err.Error())
+		go r.Run(base)
 	}
 	w := webview2.NewWithOptions(webview2.WebViewOptions{
 		Debug:    false,
