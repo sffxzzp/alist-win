@@ -51,9 +51,9 @@ func main() {
 	log.Infof("start server @ %s", base)
 	var err error
 	if conf.Conf.Scheme.Https {
-		err = go r.RunTLS(base, conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)
+		go func () {err = r.RunTLS(base, conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)}
 	} else {
-		err = go r.Run(base)
+		go func () {err = r.Run(base)}
 	}
 	if err != nil {
 		log.Errorf("failed to start: %s", err.Error())
