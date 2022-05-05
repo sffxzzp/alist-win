@@ -58,6 +58,7 @@ jobs:
           mv alist/build.sh .
           bash build.sh web
           mv dist/* alist/public
+          go mod tidy
           bash build.sh build
       - name: Upload artifact
         uses: actions/upload-artifact@v2
