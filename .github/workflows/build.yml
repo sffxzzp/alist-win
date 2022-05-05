@@ -1,12 +1,10 @@
 name: build
 
 on:
-  workflow_dispatch:
-    inputs:
-      name:
-        description: 'name'
-        required: false
-        default: 'test'
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ '**' ]
 
 jobs:
   build:
