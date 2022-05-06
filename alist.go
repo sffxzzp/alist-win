@@ -65,6 +65,7 @@ func main() {
 			Width:  1440,
 			Height: 900,
 			IconId: 2,
+			Center: true,
 		},
 	})
 	defer w.Destroy()
