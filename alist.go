@@ -23,7 +23,7 @@ func Init() bool {
 		log.Errorf(err.Error())
 		return false
 	}
-	_ := os.WriteFile("password.txt", []byte(pass.Value), 0777)
+	_ = os.WriteFile("password.txt", []byte(pass.Value), 0777)
 	server.InitIndex()
 	bootstrap.InitSettings()
 	bootstrap.InitAccounts()
