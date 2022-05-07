@@ -18,16 +18,12 @@ func Init() bool {
 	bootstrap.InitConf()
 	bootstrap.InitCron()
 	bootstrap.InitModel()
-	pass, err := model.GetSettingByKey("password")
-	if err != nil {
-		log.Errorf(err.Error())
-		return false
-	}
-	_ = os.WriteFile("password.txt", []byte(pass.Value), 0777)
 	server.InitIndex()
 	bootstrap.InitSettings()
 	bootstrap.InitAccounts()
 	bootstrap.InitCache()
+	pass, _ := model.GetSettingByKey("password")
+	_ = os.WriteFile("password.txt", []byte(pass.Value), 0777)
 	return true
 }
 
