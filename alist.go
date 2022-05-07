@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"fmt"
 	"github.com/Xhofe/alist/bootstrap"
 	"github.com/Xhofe/alist/conf"
@@ -17,15 +18,12 @@ func Init() bool {
 	bootstrap.InitConf()
 	bootstrap.InitCron()
 	bootstrap.InitModel()
-	if conf.Password {
-		pass, err := model.GetSettingByKey("password")
-		if err != nil {
-			log.Errorf(err.Error())
-			return false
-		}
-		fmt.Printf("your password: %s\n", pass.Value)
+	pass, err := model.GetSettingByKey("password")
+	if err != nil {
+		log.Errorf(err.Error())
 		return false
 	}
+	_ := os.WriteFile("password.txt", []byte(pass.Value), 0777)
 	server.InitIndex()
 	bootstrap.InitSettings()
 	bootstrap.InitAccounts()
