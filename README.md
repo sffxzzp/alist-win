@@ -1,8 +1,8 @@
 alist-win
 ======
-一个基于 go-webview2 的 alist 构建
+一个基于 [go-webview2](https://github.com/jchv/go-webview2) 的 [alist](https://github.com/Xhofe/alist) 构建
 
-下载在 [Actions](https://github.com/sffxzzp/alist-win/actions/) 里点最新的 build，然后下载 Artifacts 即可。
+[下载链接](https://nightly.link/sffxzzp/alist-win/actions/runs/2293811418/artifact.zip)
 
 提示
 ------
