@@ -1,10 +1,13 @@
 name: build
 
 on:
-  push:
-    branches: [ '**' ]
-  pull_request:
-    branches: [ '**' ]
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'alist tags for building'
+        required: true
+        type: string
+        default: ''
 
 jobs:
   build:
@@ -42,8 +45,9 @@ jobs:
           mv patch/alist.syso alist
           cat patch/go.mod.patch >> alist/go.mod
           sed -i 's/0\.0\.0\.0/127\.0\.0\.1/g' alist/conf/config.go
-          sed -i 's/linux\/amd64,windows\/amd64,darwin\/amd64/windows\/*/g' alist/build.sh
+          sed -i 's/linux\/amd64,windows\/amd64,darwin\/amd64/windows\/amd64/g' alist/build.sh
           sed -i 's/-w -s/-w -s -H windowsgui/g' alist/build.sh
+          sed -i 's/\$\(git describe --long --tags --dirty --always\)/${{ github.event.inputs.tags }}/g' alist/build.sh
           cd alist
           go mod tidy
           cd ..
