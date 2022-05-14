@@ -35,7 +35,7 @@ jobs:
         with:
           path: patch
 
-      - name: Patch
+      - name: Patch (part 1)
         run: |
           mv -f patch/alist.go alist
           mv patch/alist.syso alist
@@ -46,9 +46,11 @@ jobs:
           sed -i 's/upx -9/upx -9 -vf --lzma --compress-icons=0/g' alist/build.sh
           cd alist
           go mod tidy
-          gitTag=$(git describe --long --tags --dirty --always)
+          echo "gitTag=$(git describe --long --tags --dirty --always)" >> $GITHUB_ENV
           cd ..
-          sed -i 's/$(git describe --long --tags --dirty --always)/${ gitTag }-win/g' alist/build.sh
+      - name: Patch (part 2)
+        run: |
+          sed -i 's/$(git describe --long --tags --dirty --always)/${{ env.gitTag }}-win/g' alist/build.sh
 
       - name: Install dependencies
         run: |
