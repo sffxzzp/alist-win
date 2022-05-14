@@ -4,24 +4,20 @@ on:
   workflow_dispatch:
     inputs:
       tags:
-        description: 'alist tags for building'
-        required: true
+        description: 'trigger'
+        required: false
         type: string
         default: ''
 
 jobs:
   build:
-    strategy:
-      matrix:
-        platform: [ubuntu-latest]
-        go-version: [1.18.1]
     name: Build
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
     steps:
       - name: Setup Go
         uses: actions/setup-go@v3
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: '>=1.18.1'
 
       - name: Set up Node
         uses: actions/setup-node@v2
@@ -47,16 +43,17 @@ jobs:
           sed -i 's/0\.0\.0\.0/127\.0\.0\.1/g' alist/conf/config.go
           sed -i 's/linux\/amd64,windows\/amd64,darwin\/amd64/windows\/amd64/g' alist/build.sh
           sed -i 's/-w -s/-w -s -H windowsgui/g' alist/build.sh
-          sed -i 's/$(git describe --long --tags --dirty --always)/${{ github.event.inputs.tags }}/g' alist/build.sh
+          sed -i 's/upx.*//g' alist/build.sh
           cd alist
           go mod tidy
+          echo "gitTag=$(git describe --long --tags --dirty --always)" >> $GITHUB_ENV
           cd ..
+          sed -i 's/$(git describe --long --tags --dirty --always)/${{ env.gitTag }}-win/g' alist/build.sh
 
       - name: Install dependencies
         run: |
           docker pull techknowlogick/xgo:latest
           go install src.techknowlogick.com/xgo@latest
-          sudo apt install upx
       - name: Build
         run: |
           mv alist/build.sh .
