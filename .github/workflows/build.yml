@@ -46,9 +46,9 @@ jobs:
           sed -i 's/upx -9/upx -9 -vf --lzma --compress-icons=0/g' alist/build.sh
           cd alist
           go mod tidy
-          echo "gitTag=$(git describe --long --tags --dirty --always)" >> $GITHUB_ENV
+          gitTag=$(git describe --long --tags --dirty --always)
           cd ..
-          sed -i 's/$(git describe --long --tags --dirty --always)/${{ env.gitTag }}-win/g' alist/build.sh
+          sed -i 's/$(git describe --long --tags --dirty --always)/${ gitTag }-win/g' alist/build.sh
 
       - name: Install dependencies
         run: |
