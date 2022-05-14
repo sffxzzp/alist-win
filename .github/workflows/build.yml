@@ -43,7 +43,7 @@ jobs:
           sed -i 's/0\.0\.0\.0/127\.0\.0\.1/g' alist/conf/config.go
           sed -i 's/linux\/amd64,windows\/amd64,darwin\/amd64/windows\/amd64/g' alist/build.sh
           sed -i 's/-w -s/-w -s -H windowsgui/g' alist/build.sh
-          sed -i 's/upx.*//g' alist/build.sh
+          sed -i 's/upx -9/upx -9 -vf --lzma --compress-icons=0/g' alist/build.sh
           cd alist
           go mod tidy
           echo "gitTag=$(git describe --long --tags --dirty --always)" >> $GITHUB_ENV
@@ -54,6 +54,7 @@ jobs:
         run: |
           docker pull techknowlogick/xgo:latest
           go install src.techknowlogick.com/xgo@latest
+          sudo apt install upx
       - name: Build
         run: |
           mv alist/build.sh .
