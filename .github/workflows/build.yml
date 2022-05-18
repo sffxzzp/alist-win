@@ -1,6 +1,8 @@
 name: build
 
 on:
+  repository_dispatch:
+    types: [build-on-demand]
   workflow_dispatch:
     inputs:
       tags:
