@@ -2,7 +2,9 @@ alist-win
 ======
 一个基于 [go-webview2](https://github.com/jchv/go-webview2) 的 [alist](https://github.com/Xhofe/alist) 构建
 
-[下载链接](https://nightly.link/sffxzzp/alist-win/actions/runs/2323257929/artifact.zip)
+会自动检测新版并自动构建，版本检测采用 [PipeDream](https://pipedream.com)
+
+请自行前往 [Actions](https://github.com/sffxzzp/alist-win/actions) 中的最新构建中下载 artifact
 
 提示
 ------
