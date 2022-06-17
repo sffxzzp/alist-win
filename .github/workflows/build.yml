@@ -67,7 +67,7 @@ jobs:
           mv dist/* alist/public
           bash build.sh build
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: artifact
+          name: ${{ env.gitTag }}-win
           path: alist/build
