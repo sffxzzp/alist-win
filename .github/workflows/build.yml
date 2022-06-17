@@ -31,6 +31,7 @@ jobs:
         with:
           repository: 'Xhofe/alist'
           path: alist
+          ref: v2
           fetch-depth: 0
 
       - name: Checkout
