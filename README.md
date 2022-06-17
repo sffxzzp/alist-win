@@ -4,7 +4,7 @@ alist-win
 
 会自动检测新版并自动构建，版本检测采用 [PipeDream](https://pipedream.com)
 
-请自行前往 [Actions](https://github.com/sffxzzp/alist-win/actions) 中的最新构建中下载 artifact
+下载地址请点击 [此处](https://sffxzzp-nightly.vercel.app/alist-win)
 
 提示
 ------
