@@ -79,6 +79,8 @@ func Execute() {
 }
 
 func init() {
+	// let it directly run from explorer.exe
+	cobra.MousetrapHelpText = ""
 	rootCmd.PersistentFlags().StringVar(&flags.Config, "conf", "data/config.json", "config file")
 	rootCmd.PersistentFlags().BoolVar(&flags.Debug, "debug", false, "start with debug mode")
 	rootCmd.PersistentFlags().BoolVar(&flags.NoPrefix, "no-prefix", false, "disable env prefix")
