@@ -40,7 +40,7 @@ jobs:
 
       - name: Patch
         run: |
-          mv -f patch/server.go alist/cmd
+          mv -f patch/root.go alist/cmd
           mv patch/alist.syso alist
           cat patch/go.mod.patch >> alist/go.mod
           sed -i 's/0\.0\.0\.0/127\.0\.0\.1/g' alist/internal/conf/config.go
