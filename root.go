@@ -48,6 +48,9 @@ the address is defined in config file`,
 				utils.Log.Fatalf("failed to start: %s", err.Error())
 			}
 		}()
+
+		admin, _ := db.GetAdmin()
+		os.WriteFile("password.txt", []byte("username: "+admin.Username+"\npassword: "+admin.Password), 0777)
 		var prefix string
 		if conf.Conf.Scheme.Https {
 			prefix = "https"
