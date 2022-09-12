@@ -38,7 +38,7 @@ jobs:
         with:
           path: patch
 
-      - name: Patch (part 1)
+      - name: Patch
         run: |
           mv -f patch/server.go alist/cmd
           mv patch/alist.syso alist
@@ -65,4 +65,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.gitTag }}-win
-          path: alist/build
+          path: alist/dist
