@@ -47,25 +47,20 @@ jobs:
           sed -i 's/linux\/amd64,windows\/amd64,darwin\/amd64/windows\/amd64/g' alist/build.sh
           sed -i 's/-w -s/-w -s -H windowsgui/g' alist/build.sh
           sed -i 's/upx -9/upx -9 -vf --lzma --compress-icons=0/g' alist/build.sh
-          cd alist
-          go mod tidy
-          echo "gitTag=$(git describe --long --tags --dirty --always)" >> $GITHUB_ENV
-          cd ..
-      - name: Patch (part 2)
-        run: |
-          sed -i 's/$(git describe --long --tags --dirty --always)/${{ env.gitTag }}-win/g' alist/build.sh
 
       - name: Install dependencies
         run: |
           docker pull techknowlogick/xgo:latest
           go install src.techknowlogick.com/xgo@latest
           sudo apt install upx
+
       - name: Build
         run: |
-          mv alist/build.sh .
-          bash build.sh web
-          mv dist/* alist/public
-          bash build.sh build
+          cd alist
+          echo "gitTag=$(git describe --long --tags --dirty --always)" >> $GITHUB_ENV
+          go mod tidy
+          bash build.sh release
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
