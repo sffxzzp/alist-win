@@ -59,7 +59,7 @@ jobs:
           cd alist
           echo "gitTag=$(git describe --long --tags --dirty --always)" >> $GITHUB_ENV
           go mod tidy
-          bash build.sh release
+          bash build.sh dev
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
