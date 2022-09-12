@@ -48,6 +48,12 @@ the address is defined in config file`,
 				utils.Log.Fatalf("failed to start: %s", err.Error())
 			}
 		}()
+		var prefix string
+		if conf.Conf.Scheme.Https {
+			prefix = "https"
+		} else {
+			prefix = "http"
+		}
 		w := webview2.NewWithOptions(webview2.WebViewOptions{
 			Debug:    false,
 			DataPath: "./data",
@@ -60,6 +66,8 @@ the address is defined in config file`,
 			},
 		})
 		defer w.Destroy()
+		w.Navigate(fmt.Sprintf("%s://127.0.0.1:%d", prefix, conf.Conf.Port))
+		w.Run()
 	},
 }
 
