@@ -40,10 +40,10 @@ jobs:
 
       - name: Patch (part 1)
         run: |
-          mv -f patch/alist.go alist
+          mv -f patch/server.go alist/cmd
           mv patch/alist.syso alist
           cat patch/go.mod.patch >> alist/go.mod
-          sed -i 's/0\.0\.0\.0/127\.0\.0\.1/g' alist/conf/config.go
+          sed -i 's/0\.0\.0\.0/127\.0\.0\.1/g' alist/internal/conf/config.go
           sed -i 's/linux\/amd64,windows\/amd64,darwin\/amd64/windows\/amd64/g' alist/build.sh
           sed -i 's/-w -s/-w -s -H windowsgui/g' alist/build.sh
           sed -i 's/upx -9/upx -9 -vf --lzma --compress-icons=0/g' alist/build.sh
