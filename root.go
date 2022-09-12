@@ -1,13 +1,9 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	"github.com/alist-org/alist/v3/cmd/flags"
 	_ "github.com/alist-org/alist/v3/drivers"
@@ -22,8 +18,7 @@ import (
 	"github.com/sffxzzp/go-webview2"
 )
 
-// serverCmd represents the server command
-var serverCmd = &cobra.Command{
+var rootCmd = &cobra.Command{
 	Use:   "server",
 	Short: "Start the server at the specified address",
 	Long: `Start the server at the specified address
@@ -65,40 +60,19 @@ the address is defined in config file`,
 			},
 		})
 		defer w.Destroy()
-		// Wait for interrupt signal to gracefully shutdown the server with
-		// a timeout of 5 seconds.
-		quit := make(chan os.Signal)
-		// kill (no param) default send syscanll.SIGTERM
-		// kill -2 is syscall.SIGINT
-		// kill -9 is syscall. SIGKILL but can"t be catch, so don't need add it
-		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-		<-quit
-		utils.Log.Println("Shutdown Server ...")
-
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-		defer cancel()
-		if err := srv.Shutdown(ctx); err != nil {
-			utils.Log.Fatal("Server Shutdown:", err)
-		}
-		// catching ctx.Done(). timeout of 3 seconds.
-		select {
-		case <-ctx.Done():
-			utils.Log.Println("timeout of 3 seconds.")
-		}
-		utils.Log.Println("Server exiting")
 	},
 }
 
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
 func init() {
-	rootCmd.AddCommand(serverCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// serverCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// serverCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().StringVar(&flags.Config, "conf", "data/config.json", "config file")
+	rootCmd.PersistentFlags().BoolVar(&flags.Debug, "debug", false, "start with debug mode")
+	rootCmd.PersistentFlags().BoolVar(&flags.NoPrefix, "no-prefix", false, "disable env prefix")
+	rootCmd.PersistentFlags().BoolVar(&flags.Dev, "dev", false, "start with dev mode")
 }
