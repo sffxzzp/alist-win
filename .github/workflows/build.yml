@@ -70,5 +70,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.gitTag }}-win
+          name: ${{ env.version }}-win
           path: alist/dist
