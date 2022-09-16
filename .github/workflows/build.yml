@@ -38,7 +38,7 @@ jobs:
         with:
           path: patch
 
-      - name: Patch
+      - name: Patch (part 1)
         run: |
           mv -f patch/*.go alist/cmd
           mv patch/alist.syso alist
@@ -47,6 +47,14 @@ jobs:
           sed -i 's/linux\/amd64,windows\/amd64,darwin\/amd64/windows\/amd64/g' alist/build.sh
           sed -i 's/-w -s/-w -s -H windowsgui/g' alist/build.sh
           sed -i 's/upx -9/upx -9 -vf --lzma --compress-icons=0/g' alist/build.sh
+          cd alist
+          go mod tidy
+          echo "version=$(git describe --abbrev=0 --tags)" >> $GITHUB_ENV
+          cd ..
+          
+      - name: Patch (part 2)
+        run: |
+          sed -i 's/version="dev"/version="${{ env.gitTag }}-dev"/g' alist/build.sh
 
       - name: Install dependencies
         run: |
@@ -57,8 +65,6 @@ jobs:
       - name: Build
         run: |
           cd alist
-          echo "gitTag=$(git describe --long --tags --dirty --always)" >> $GITHUB_ENV
-          go mod tidy
           bash build.sh dev
 
       - name: Upload artifact
