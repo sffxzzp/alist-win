@@ -54,7 +54,7 @@ jobs:
           
       - name: Patch (part 2)
         run: |
-          sed -i 's/version="dev"/version="${{ env.gitTag }}-dev"/g' alist/build.sh
+          sed -i 's/version="dev"/version="${{ env.version }}-dev"/g' alist/build.sh
 
       - name: Install dependencies
         run: |
