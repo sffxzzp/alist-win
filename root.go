@@ -19,7 +19,7 @@ import (
 	"github.com/sffxzzp/go-webview2"
 )
 
-var rootCmd = &cobra.Command{
+var RootCmd = &cobra.Command{
 	Use:   "server",
 	Short: "Start the server at the specified address",
 	Long: `Start the server at the specified address
@@ -76,7 +76,7 @@ the address is defined in config file`,
 }
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
+	if err := RootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -85,9 +85,9 @@ func Execute() {
 func init() {
 	// let it directly run from explorer.exe
 	cobra.MousetrapHelpText = ""
-	rootCmd.PersistentFlags().StringVar(&flags.DataDir, "data", "data", "config file")
-	rootCmd.PersistentFlags().BoolVar(&flags.Debug, "debug", false, "start with debug mode")
-	rootCmd.PersistentFlags().BoolVar(&flags.NoPrefix, "no-prefix", false, "disable env prefix")
-	rootCmd.PersistentFlags().BoolVar(&flags.Dev, "dev", false, "start with dev mode")
-	rootCmd.PersistentFlags().BoolVar(&flags.ForceBinDir, "force-bin-dir", false, "Force to use the directory where the binary file is located as data directory")
+	RootCmd.PersistentFlags().StringVar(&flags.DataDir, "data", "data", "config file")
+	RootCmd.PersistentFlags().BoolVar(&flags.Debug, "debug", false, "start with debug mode")
+	RootCmd.PersistentFlags().BoolVar(&flags.NoPrefix, "no-prefix", false, "disable env prefix")
+	RootCmd.PersistentFlags().BoolVar(&flags.Dev, "dev", false, "start with dev mode")
+	RootCmd.PersistentFlags().BoolVar(&flags.ForceBinDir, "force-bin-dir", false, "Force to use the directory where the binary file is located as data directory")
 }
