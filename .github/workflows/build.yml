@@ -47,6 +47,7 @@ jobs:
           sed -i 's/linux\/amd64,windows\/amd64,darwin\/amd64/windows\/amd64/g' alist/build.sh
           sed -i 's/-w -s/-w -s -H windowsgui/g' alist/build.sh
           sed -i 's/upx -9/upx -9 -vf --lzma --compress-icons=0/g' alist/build.sh
+          sed -i 's/alist-windows-amd64.exe/alist-windows*.exe/g' alist/build.sh
           cd alist
           go mod tidy
           echo "version=$(git describe --abbrev=0 --tags)" >> $GITHUB_ENV
