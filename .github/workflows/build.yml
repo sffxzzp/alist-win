@@ -4,12 +4,6 @@ on:
   repository_dispatch:
     types: [build-on-demand]
   workflow_dispatch:
-    inputs:
-      tags:
-        description: 'trigger'
-        required: false
-        type: string
-        default: ''
 
 jobs:
   build:
@@ -44,7 +38,7 @@ jobs:
           mv patch/alist.syso alist
           cat patch/go.mod.patch >> alist/go.mod
           sed -i 's/0\.0\.0\.0/127\.0\.0\.1/g' alist/internal/conf/config.go
-          sed -i 's/OS_ARCHES=\(linux-musl-amd64 linux-musl-arm64\)/OS_ARCHES=\(\)/g' alist/build.sh
+          sed -i 's/linux-musl-amd64 linux-musl-arm64//g' alist/build.sh
           sed -i 's/windows\/amd64,darwin\/amd64/windows\/amd64/g' alist/build.sh
           sed -i 's/-w -s/-w -s -H windowsgui/g' alist/build.sh
           sed -i 's/upx -9/upx -9 -vf --lzma --compress-icons=0/g' alist/build.sh
