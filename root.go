@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/alist-org/alist/v3/cmd/flags"
 	_ "github.com/alist-org/alist/v3/drivers"
@@ -26,7 +27,12 @@ var RootCmd = &cobra.Command{
 the address is defined in config file`,
 	Run: func(cmd *cobra.Command, args []string) {
 		Init()
+		if conf.Conf.DelayedStart != 0 {
+			utils.Log.Infof("delayed start for %d seconds", conf.Conf.DelayedStart)
+			time.Sleep(time.Duration(conf.Conf.DelayedStart) * time.Second)
+		}
 		bootstrap.InitAria2()
+		bootstrap.InitQbittorrent()
 		bootstrap.LoadStorages()
 		if !flags.Debug && !flags.Dev {
 			gin.SetMode(gin.ReleaseMode)
@@ -34,22 +40,54 @@ the address is defined in config file`,
 		r := gin.New()
 		r.Use(gin.LoggerWithWriter(log.StandardLogger().Out), gin.RecoveryWithWriter(log.StandardLogger().Out))
 		server.Init(r)
-		base := fmt.Sprintf("%s:%d", conf.Conf.Scheme.Address, conf.Conf.Scheme.Port)
-		utils.Log.Infof("start server @ %s", base)
-		srv := &http.Server{Addr: base, Handler: r}
-		go func() {
-			var err error
-			if conf.Conf.Scheme.HttpsPort != -1 {
-				//err = r.RunTLS(base, conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)
-				err = srv.ListenAndServeTLS(conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)
-			} else {
-				err = srv.ListenAndServe()
-			}
-			if err != nil && err != http.ErrServerClosed {
-				utils.Log.Fatalf("failed to start: %s", err.Error())
-			}
-		}()
-
+		var httpSrv, httpsSrv, unixSrv *http.Server
+		if conf.Conf.Scheme.HttpPort != -1 {
+			httpBase := fmt.Sprintf("%s:%d", conf.Conf.Scheme.Address, conf.Conf.Scheme.HttpPort)
+			utils.Log.Infof("start HTTP server @ %s", httpBase)
+			httpSrv = &http.Server{Addr: httpBase, Handler: r}
+			go func() {
+				err := httpSrv.ListenAndServe()
+				if err != nil && err != http.ErrServerClosed {
+					utils.Log.Fatalf("failed to start http: %s", err.Error())
+				}
+			}()
+		}
+		if conf.Conf.Scheme.HttpsPort != -1 {
+			httpsBase := fmt.Sprintf("%s:%d", conf.Conf.Scheme.Address, conf.Conf.Scheme.HttpsPort)
+			utils.Log.Infof("start HTTPS server @ %s", httpsBase)
+			httpsSrv = &http.Server{Addr: httpsBase, Handler: r}
+			go func() {
+				err := httpsSrv.ListenAndServeTLS(conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)
+				if err != nil && err != http.ErrServerClosed {
+					utils.Log.Fatalf("failed to start https: %s", err.Error())
+				}
+			}()
+		}
+		if conf.Conf.Scheme.UnixFile != "" {
+			utils.Log.Infof("start unix server @ %s", conf.Conf.Scheme.UnixFile)
+			unixSrv = &http.Server{Handler: r}
+			go func() {
+				listener, err := net.Listen("unix", conf.Conf.Scheme.UnixFile)
+				if err != nil {
+					utils.Log.Fatalf("failed to listen unix: %+v", err)
+				}
+				// set socket file permission
+				mode, err := strconv.ParseUint(conf.Conf.Scheme.UnixFilePerm, 8, 32)
+				if err != nil {
+					utils.Log.Errorf("failed to parse socket file permission: %+v", err)
+				} else {
+					err = os.Chmod(conf.Conf.Scheme.UnixFile, os.FileMode(mode))
+					if err != nil {
+						utils.Log.Errorf("failed to chmod socket file: %+v", err)
+					}
+				}
+				err = unixSrv.Serve(listener)
+				if err != nil && err != http.ErrServerClosed {
+					utils.Log.Fatalf("failed to start unix: %s", err.Error())
+				}
+			}()
+		}
+		
 		admin, _ := op.GetAdmin()
 		os.WriteFile("password.txt", []byte("username: "+admin.Username+"\npassword: "+admin.Password), 0777)
 		var prefix string
@@ -70,7 +108,7 @@ the address is defined in config file`,
 			},
 		})
 		defer w.Destroy()
-		w.Navigate(fmt.Sprintf("%s://127.0.0.1:%d", prefix, conf.Conf.Port))
+		w.Navigate(fmt.Sprintf("%s://127.0.0.1:%d", prefix, conf.Conf.Scheme.Port))
 		w.Run()
 	},
 }
