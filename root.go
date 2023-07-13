@@ -91,10 +91,13 @@ the address is defined in config file`,
 		admin, _ := op.GetAdmin()
 		os.WriteFile("password.txt", []byte("username: "+admin.Username+"\npassword: "+admin.Password), 0777)
 		var prefix string
-		if conf.Conf.Scheme.Https {
+		var port int
+		if conf.Conf.Scheme.HttpsPort != -1 {
 			prefix = "https"
+			port = conf.Conf.Scheme.HttpsPort
 		} else {
 			prefix = "http"
+			port = conf.Conf.Scheme.HttpPort
 		}
 		w := webview2.NewWithOptions(webview2.WebViewOptions{
 			Debug:    false,
@@ -108,7 +111,7 @@ the address is defined in config file`,
 			},
 		})
 		defer w.Destroy()
-		w.Navigate(fmt.Sprintf("%s://127.0.0.1:%d", prefix, conf.Conf.Scheme.Port))
+		w.Navigate(fmt.Sprintf("%s://127.0.0.1:%d", prefix, port))
 		w.Run()
 	},
 }
