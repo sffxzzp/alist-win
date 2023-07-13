@@ -34,12 +34,12 @@ the address is defined in config file`,
 		r := gin.New()
 		r.Use(gin.LoggerWithWriter(log.StandardLogger().Out), gin.RecoveryWithWriter(log.StandardLogger().Out))
 		server.Init(r)
-		base := fmt.Sprintf("%s:%d", conf.Conf.Address, conf.Conf.Port)
+		base := fmt.Sprintf("%s:%d", conf.Conf.Scheme.Address, conf.Conf.Scheme.Port)
 		utils.Log.Infof("start server @ %s", base)
 		srv := &http.Server{Addr: base, Handler: r}
 		go func() {
 			var err error
-			if conf.Conf.Scheme.Https {
+			if conf.Conf.Scheme.HttpsPort != -1 {
 				//err = r.RunTLS(base, conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)
 				err = srv.ListenAndServeTLS(conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)
 			} else {
