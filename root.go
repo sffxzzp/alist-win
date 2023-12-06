@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/alist-org/alist/v3/cmd/flags"
 	_ "github.com/alist-org/alist/v3/drivers"
+	_ "github.com/alist-org/alist/v3/internal/offline_download"
 	"github.com/alist-org/alist/v3/internal/op"
 	"github.com/alist-org/alist/v3/internal/bootstrap"
 	"github.com/alist-org/alist/v3/internal/conf"
@@ -33,9 +35,9 @@ the address is defined in config file`,
 			utils.Log.Infof("delayed start for %d seconds", conf.Conf.DelayedStart)
 			time.Sleep(time.Duration(conf.Conf.DelayedStart) * time.Second)
 		}
-		bootstrap.InitAria2()
-		bootstrap.InitQbittorrent()
+		bootstrap.InitOfflineDownloadTools()
 		bootstrap.LoadStorages()
+		bootstrap.InitTaskManager()
 		if !flags.Debug && !flags.Dev {
 			gin.SetMode(gin.ReleaseMode)
 		}
@@ -49,7 +51,7 @@ the address is defined in config file`,
 			httpSrv = &http.Server{Addr: httpBase, Handler: r}
 			go func() {
 				err := httpSrv.ListenAndServe()
-				if err != nil && err != http.ErrServerClosed {
+				if err != nil && !errors.Is(err, http.ErrServerClosed) {
 					utils.Log.Fatalf("failed to start http: %s", err.Error())
 				}
 			}()
@@ -60,7 +62,7 @@ the address is defined in config file`,
 			httpsSrv = &http.Server{Addr: httpsBase, Handler: r}
 			go func() {
 				err := httpsSrv.ListenAndServeTLS(conf.Conf.Scheme.CertFile, conf.Conf.Scheme.KeyFile)
-				if err != nil && err != http.ErrServerClosed {
+				if err != nil && !errors.Is(err, http.ErrServerClosed) {
 					utils.Log.Fatalf("failed to start https: %s", err.Error())
 				}
 			}()
@@ -84,22 +86,30 @@ the address is defined in config file`,
 					}
 				}
 				err = unixSrv.Serve(listener)
-				if err != nil && err != http.ErrServerClosed {
+				if err != nil && !errors.Is(err, http.ErrServerClosed) {
 					utils.Log.Fatalf("failed to start unix: %s", err.Error())
 				}
 			}()
 		}
-		
-		admin, _ := op.GetAdmin()
-		os.WriteFile("password.txt", []byte("username: "+admin.Username+"\npassword: "+admin.Password), 0777)
+
+		pwdFile := "password.txt"
+		_, err := os.Stat(pwdFile)
+		if os.IsNotExists(err) {
+			admin, _ := op.GetAdmin()
+			newPwd := random.String(8)
+			setAdminPassword(newPwd)
+			os.WriteFile(pwdFile, []byte("username: "+admin.Username+"\npassword: "+newPwd), 0777)
+		}
+
 		var prefix string
 		var port int
+		if conf.Conf.Scheme.HttpPort != -1 {
+			prefix = "http"
+			port = conf.Conf.Scheme.HttpPort
+		}
 		if conf.Conf.Scheme.HttpsPort != -1 {
 			prefix = "https"
 			port = conf.Conf.Scheme.HttpsPort
-		} else {
-			prefix = "http"
-			port = conf.Conf.Scheme.HttpPort
 		}
 		w := webview2.NewWithOptions(webview2.WebViewOptions{
 			Debug:    false,
@@ -128,9 +138,10 @@ func Execute() {
 func init() {
 	// let it directly run from explorer.exe
 	cobra.MousetrapHelpText = ""
-	RootCmd.PersistentFlags().StringVar(&flags.DataDir, "data", "data", "config file")
+	RootCmd.PersistentFlags().StringVar(&flags.DataDir, "data", "data", "data folder")
 	RootCmd.PersistentFlags().BoolVar(&flags.Debug, "debug", false, "start with debug mode")
 	RootCmd.PersistentFlags().BoolVar(&flags.NoPrefix, "no-prefix", false, "disable env prefix")
 	RootCmd.PersistentFlags().BoolVar(&flags.Dev, "dev", false, "start with dev mode")
 	RootCmd.PersistentFlags().BoolVar(&flags.ForceBinDir, "force-bin-dir", false, "Force to use the directory where the binary file is located as data directory")
+	RootCmd.PersistentFlags().BoolVar(&flags.LogStd, "log-std", false, "Force to log to std")
 }
