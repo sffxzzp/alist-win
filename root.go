@@ -16,6 +16,7 @@ import (
 	"github.com/alist-org/alist/v3/internal/bootstrap"
 	"github.com/alist-org/alist/v3/internal/conf"
 	"github.com/alist-org/alist/v3/pkg/utils"
+	"github.com/alist-org/alist/v3/pkg/utils/random"
 	"github.com/alist-org/alist/v3/server"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -93,8 +94,7 @@ the address is defined in config file`,
 		}
 
 		pwdFile := "password.txt"
-		_, err := os.Stat(pwdFile)
-		if os.IsNotExists(err) {
+		if _, err := os.Stat(pwdFile); os.IsNotExist(err) {
 			admin, _ := op.GetAdmin()
 			newPwd := random.String(8)
 			setAdminPassword(newPwd)
