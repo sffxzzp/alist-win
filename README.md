@@ -4,7 +4,7 @@ alist-win
 
 会自动检测新版并自动构建，版本检测采用 [PipeDream](https://pipedream.com)
 
-下载地址请点击 [此处](https://nightly.ore-imo.tk/alist-win)
+下载地址请点击 [此处](https://nightly.kanojo.pp.ua/alist-win)
 
 提示
 ------
